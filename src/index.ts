@@ -32,9 +32,15 @@ const app = new Elysia()
     );
     return "Updated Successfully";
   })
-  // .delete("/books/:id", ({ params, error }) => {
-  //   const id = Number(params.id)
-  // }
+  .delete("/books/:id", ({ params, error }) => {
+    const id = Number(params.id);
+    const book = bookList.find((book) => book.id === id);
+    if (!book) {
+      return error(404, "Book not found");
+    }
+    bookList = bookList.filter((book) => book.id !== id);
+    return "Deleted Successfully";
+  })
   .listen(3000);
 
 console.log(
