@@ -20,20 +20,27 @@ const app = new Elysia()
     bookList.push(newBook);
     return newBook;
   })
-  .put("/books/:id", ({ params, body, error }) => {
+  .put("/books/:id", ({ params, body, error, set }) => {
     const id = Number(params.id);
-    const bookIndex = bookList.findIndex((book) => book.id === id);
-  
-    if (bookIndex === -1) {
-      error(404, "Book not found");
-    } else {
-      const updatedBook = body as Book;
-      const book = bookList[bookIndex];
-      book.title = updatedBook.title;
-      book.price = updatedBook.price;
-      return book;
-
-  }})
+    const book = bookList.find((book) => book.id === id);
+    if (!book) {
+      return error(404, "Book not found");
+    }
+    const updatedBook = body as Book;
+    bookList = bookList.map((book) =>
+      book.id === id ? { ...book, ...updatedBook } : book
+    );
+    return "Updated Successfully";
+  })
+  .delete("/books/:id", ({ params, error }) => {
+    const id = Number(params.id);
+    const book = bookList.find((book) => book.id === id);
+    if (!book) {
+      return error(404, "Book not found");
+    }
+    bookList = bookList.filter((book) => book.id !== id);
+    return "Deleted Successfully";
+  })
   .listen(3000);
 
 console.log(
